@@ -3,7 +3,7 @@ import fs from 'fs'
 import cors from 'cors'
 import { Web3 } from 'web3'
 
-const CONTRACT_ADDRESS = '0xf8701dfd34a91f4925ae3a43d932d2c0eef99009'
+const CONTRACT_ADDRESS = '0x365c4a9b9bc363d2973382ca0cdacbf274eeee71'
 const web3 = new Web3("http://localhost:8545")
 
 const ABI = JSON.parse(fs.readFileSync("./contractABI.json").toString())
