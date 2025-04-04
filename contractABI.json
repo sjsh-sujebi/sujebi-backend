@@ -1,0 +1,184 @@
+[
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "myHash",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "string",
+				"name": "complimentValue",
+				"type": "string"
+			}
+		],
+		"name": "addCompliment",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "compliments",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "from",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "string",
+				"name": "message",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
+			}
+		],
+		"name": "getCompliments",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "bytes32",
+						"name": "from",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "string",
+						"name": "message",
+						"type": "string"
+					}
+				],
+				"internalType": "struct StudentIdentification.Compliment[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"name": "signedStudents",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "uint8",
+				"name": "v",
+				"type": "uint8"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "r",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "s",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "uint8",
+				"name": "v",
+				"type": "uint8"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "r",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "s",
+				"type": "bytes32"
+			}
+		],
+		"name": "uploadStudent",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "hash",
+				"type": "bytes32"
+			}
+		],
+		"name": "verifyStudent",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
