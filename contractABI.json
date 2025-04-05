@@ -20,6 +20,11 @@
 				"internalType": "string",
 				"name": "complimentValue",
 				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "timestamp",
+				"type": "string"
 			}
 		],
 		"name": "addCompliment",
@@ -51,6 +56,11 @@
 				"internalType": "string",
 				"name": "message",
 				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "timestamp",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",
@@ -76,6 +86,11 @@
 					{
 						"internalType": "string",
 						"name": "message",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "timestamp",
 						"type": "string"
 					}
 				],

@@ -2,9 +2,13 @@ import express from 'express'
 import fs from 'fs'
 import cors from 'cors'
 import { Web3 } from 'web3'
+import https from 'https'
 
-const CONTRACT_ADDRESS = '0x365c4a9b9bc363d2973382ca0cdacbf274eeee71'
-const web3 = new Web3("http://localhost:8545")
+var privateKey  = fs.readFileSync('/etc/letsencrypt/live/api.sujebi.tech/privkey.pem', 'utf8');
+var certificate = fs.readFileSync('/etc/letsencrypt/live/api.sujebi.tech/fullchain.pem', 'utf8');
+
+const CONTRACT_ADDRESS = '0x57dee421776f250bc5fff320e2e48ad880bb1c35'
+const web3 = new Web3("http://188.166.215.158:8545")
 
 const ABI = JSON.parse(fs.readFileSync("./contractABI.json").toString())
 const key = JSON.parse(fs.readFileSync("./accountKey.json").toString())
@@ -25,11 +29,13 @@ async function verifyStudent(messageHash) {
 }
 
 async function addCompliment(value, hash, myHash) {
-    await contract.methods.addCompliment(hash, myHash, value).send({ from : wallet.address })
+    const timestamp = Date.now().toString()
+
+    await contract.methods.addCompliment(hash, myHash, value, timestamp).send({ from : wallet.address })
 }
 
 async function getCompliments(hash) {
-    return await contract.methods.getCompliments(hash).send({ from : wallet.address})
+    return await contract.methods.getCompliments(hash).call({ from : wallet.address})
 }
 
 // await uploadStudent(JSON.stringify({
@@ -60,9 +66,20 @@ app.post('/register', (req, res) => {
         db.pending.push({ keyword1, keyword2, keyword3, gradeNumber, classNumber, studentNumber, base64Image })
         
         fs.writeFileSync("db.json", JSON.stringify(db))
-        res.send("ok")
+
+        res.json({
+            is_success: true,
+            payload: {
+                msg: ""
+            }
+        })
     } catch (e) {
-        res.send(e)
+        res.json({
+            is_success: false,
+            payload: {
+                msg: e
+            }
+        })
     }
 })
 
@@ -75,14 +92,30 @@ app.post("/login", (req, res) => {
         for (const e of db.users) {
             if (e.keyword1 == keyword1 && e.keyword2 == keyword2 && e.keyword3 == keyword3  && e.studentNumber == studentNumber && e.gradeNumber == gradeNumber && e.classNumber == classNumber) {
                 const messageHash = web3.utils.sha3(JSON.stringify(e));
-                res.send(`ok:${messageHash}`)
+                res.json({
+                    is_success: true,
+                    payload: {
+                        msg: "Login success!",
+                        userHash: messageHash
+                    }
+                })
                 return
             }
         }
 
-        res.send("error: nosuchuser")
+        res.json({
+            is_success: false,
+            payload: {
+                msg: "Login failed!"
+            }
+        })
     } catch (e) {
-        res.send(e)
+        res.json({
+            is_success: false,
+            payload: {
+                msg: e
+            }
+        })
     }
 })
 
@@ -93,12 +126,37 @@ app.post("/verify", async (req, res) => {
             return /^0x[a-fA-F0-9]{64}$/.test(str);
         };
         if (!isBytes32(hash)) {
-            res.send("ok:false")
+            res.json({
+                is_success: false,
+                payload: {
+                    msg: "Verification Failed. Invalid hash format."
+                }
+            })
             return
         }
-        res.send(`ok:${await verifyStudent(hash)}:${hash}`)
+        if (await verifyStudent(hash)) {
+            res.json({
+                is_success: true,
+                payload: {
+                    msg: "Verification Success!",
+                    hash: hash
+                }
+            })
+        } else {
+            res.json({
+                is_success: false,
+                payload: {
+                    msg: "Verification Failed!"
+                }
+            })
+        }
     } catch(e) {
-        res.send(e)
+        res.json({
+            is_success: false,
+            payload: {
+                msg: e
+            }
+        })
     }
 })
 
@@ -107,9 +165,19 @@ app.post("/createCompliment", async (req, res) => {
 
     try {
         await addCompliment(value, hash, myHash)
-        res.send("ok")
+        res.json({
+            is_success: true,
+            payload: {
+                msg: "ok"
+            }
+        })
     } catch (e) {
-        res.send(e)
+        res.json({
+            is_success: true,
+            payload: {
+                msg: e
+            }
+        })
     }
 })
 
@@ -117,9 +185,19 @@ app.post("/getCompliments", async (req, res) => {
     const { hash } = req.body
 
     const compliments = await getCompliments(hash)
-    res.send(compliments)
+
+    res.json({
+        is_success: true,
+        payload: {
+            msg: {
+                compliments: compliments.map(({ from, message, timestamp }) => ({ from, message, timestamp }))
+            }
+        }
+    })
 })
 
-app.listen(8080, () => {
-    console.log("application up and listening to port: 8080")
+app.listen(8081, () => {
+    console.log("application up and listening to port: 8081")
 })
+
+https.createServer({key: privateKey, cert: certificate}, app).listen(8443, () => console.log("up"))
