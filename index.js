@@ -3,6 +3,7 @@ import fs from 'fs'
 import cors from 'cors'
 import { Web3 } from 'web3'
 import https from 'https'
+import { v4 as uuidv4 } from 'uuid';
 
 var privateKey  = fs.readFileSync('/etc/letsencrypt/live/api.sujebi.tech/privkey.pem', 'utf8');
 var certificate = fs.readFileSync('/etc/letsencrypt/live/api.sujebi.tech/fullchain.pem', 'utf8');
@@ -63,8 +64,12 @@ app.post('/register', (req, res) => {
         const { keyword1, keyword2, keyword3, gradeNumber, classNumber, studentNumber, base64Image } = req.body
 
         const db = readDB('db.json')
-        db.pending.push({ keyword1, keyword2, keyword3, gradeNumber, classNumber, studentNumber, base64Image })
+
+        const myuuid = uuidv4()
+        fs.writeFileSync(`./imgs/${myuuid}.jpg`, Buffer.from(base64Image, "base64"))
         
+        db.pending.push({ keyword1, keyword2, keyword3, gradeNumber, classNumber, studentNumber, image: myuuid })
+
         fs.writeFileSync("db.json", JSON.stringify(db))
 
         res.json({
