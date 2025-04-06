@@ -125,7 +125,7 @@ app.post('/register', (req, res) => {
         }
 
         const myuuid = uuidv4()
-        fs.writeFileSync(`./secrets/${process.env.SECRET_PATH}/${myuuid}.jpg`, base64Image, { encoding: "base64" })
+        fs.writeFileSync(`./secrets/${process.env.SECRET_PATH}/${myuuid}.jpg`, base64Image, { encoding: "base64url" })
         
         db.pending.push({ keyword1, keyword2, keyword3, gradeNumber, classNumber, studentNumber, image: myuuid })
 
