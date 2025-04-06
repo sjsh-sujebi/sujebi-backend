@@ -143,7 +143,7 @@ app.post('/register', (req, res) => {
         res.json({
             is_success: false,
             payload: {
-                msg: e
+                msg: e.message
             }
         })
     }
@@ -179,7 +179,7 @@ app.post("/login", (req, res) => {
         res.json({
             is_success: false,
             payload: {
-                msg: e
+                msg: e.message
             }
         })
     }
@@ -220,7 +220,7 @@ app.post("/verify", async (req, res) => {
         res.json({
             is_success: false,
             payload: {
-                msg: e
+                msg: e.message
             }
         })
     }
@@ -241,7 +241,7 @@ app.post("/createCompliment", async (req, res) => {
         res.json({
             is_success: true,
             payload: {
-                msg: e
+                msg: e.message
             }
         })
     }
