@@ -124,8 +124,10 @@ app.post('/register', (req, res) => {
             }
         }
 
+        const base64ImageData = base64Image.match(/^data:(image\/\w+);base64,(.+)$/)[2]
+
         const myuuid = uuidv4()
-        fs.writeFileSync(`./secrets/${process.env.SECRET_PATH}/${myuuid}.jpg`, base64Image, { encoding: "base64url" })
+        fs.writeFileSync(`./secrets/${process.env.SECRET_PATH}/${myuuid}.jpg`, base64ImageData, { encoding: "base64" })
         
         db.pending.push({ keyword1, keyword2, keyword3, gradeNumber, classNumber, studentNumber, image: myuuid })
 
