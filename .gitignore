@@ -2,3 +2,5 @@ accountKey.json
 db.json
 users.json
 node_modules
+.env
+secrets

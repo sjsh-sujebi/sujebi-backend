@@ -1,9 +1,10 @@
 import express from 'express'
-import fs from 'fs'
+import fs, { writeFileSync } from 'fs'
 import cors from 'cors'
 import { Web3 } from 'web3'
 import https from 'https'
 import { v4 as uuidv4 } from 'uuid';
+import 'dotenv/config'
 
 var privateKey  = fs.readFileSync('/etc/letsencrypt/live/api.sujebi.tech/privkey.pem', 'utf8');
 var certificate = fs.readFileSync('/etc/letsencrypt/live/api.sujebi.tech/fullchain.pem', 'utf8');
@@ -52,21 +53,79 @@ async function getCompliments(hash) {
 
 const app = express()
 
+app.use(express.static(`secrets`))
 app.use(express.json({limit: '100mb'}))
 app.use(cors())
+app.set("view engine", "ejs");
 
 function readDB(filename) {
     return JSON.parse(fs.readFileSync(filename).toString())
 }
 
+app.get(`/${process.env.SECRET_PATH}/manage`, (req, res) => {
+    const db = readDB('db.json')
+    db["secret_image_path"] = process.env.SECRET_IMAGE_PATH 
+    res.render("secret.ejs", db)
+})
+
+app.get(`/${process.env.SECRET_PATH}/process/:img_data`, async (req, res) => {
+    const db = readDB('db.json')
+    for (const i of db["pending"]) {
+        if (i.image == req.params.img_data) {
+            const json = {
+                "keyword1": i.keyword1, 
+                "keyword2": i.keyword2, 
+                "keyword3": i.keyword3, 
+                "gradeNumber": i.gradeNumber,
+                "classNumber": i.classNumber,
+                "studentNumber": i.studentNumber
+            }
+            await uploadStudent(JSON.stringify(json))
+
+            const users = readDB("users.json")
+            users.users.push(json)
+            writeFileSync("users.json", JSON.stringify(users))
+
+            db["pending"] = db["pending"].filter(x => x.image != i.image)
+            writeFileSync("db.json", JSON.stringify(db))
+            res.send("success")
+            return
+        }
+    }
+    res.send("failed")
+})
+
 app.post('/register', (req, res) => {
     try {
         const { keyword1, keyword2, keyword3, gradeNumber, classNumber, studentNumber, base64Image } = req.body
 
+        const users = readDB('users.json')
+        for (const e of users.users) {
+            if (e.studentNumber == studentNumber && e.gradeNumber == gradeNumber && e.classNumber == classNumber) {
+                res.json({
+                    is_success: false,
+                    payload: {
+                        msg: "user already exists"
+                    }
+                })
+                return
+            }
+        }
+
         const db = readDB('db.json')
+        for (const e of db.pending) {
+            if (e.studentNumber == studentNumber && e.gradeNumber == gradeNumber && e.classNumber == classNumber) {
+                res.json({
+                    is_success: false,
+                    payload: {
+                        msg: "user already exists"
+                    }
+                })
+            }
+        }
 
         const myuuid = uuidv4()
-        fs.writeFileSync(`./imgs/${myuuid}.jpg`, Buffer.from(base64Image, "base64"))
+        fs.writeFileSync(`./secrets/${process.env.SECRET_PATH}/${myuuid}.jpg`, Buffer.from(base64Image, "base64"))
         
         db.pending.push({ keyword1, keyword2, keyword3, gradeNumber, classNumber, studentNumber, image: myuuid })
 
